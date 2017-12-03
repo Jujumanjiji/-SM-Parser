@@ -27,6 +27,24 @@ struct NoteData
 	vector<vector<NoteData> > bars;
 };
 
+/*-------------------------------------------------*/
+/* FUNCTION THAT REMOVES WHITESPACES FROM A STRING */
+/*-------------------------------------------------*/
+std::string deleteSpaces(const std::string &str)
+{
+	std::string returnString;
+
+	for (size_t i = 0; i < str.size(); i++)
+	{
+		if (str[i] == ' ')
+			continue;
+
+		returnString += str[i];
+	}
+
+	return returnString;
+}
+
 /*--------------------------------*/
 /* SM FILE'S MAIN DATAS STRUCTURE */
 /*--------------------------------*/
@@ -90,17 +108,25 @@ struct metaData
 /*-----------------*/
 /* Notes structure */
 /*-----------------*/
+
 struct Notes
 {
+	string notesTypes;
+	string description;
+	string difficultyClass;
+	int difficultyMeter;
+	float radarValues;
+
 	bool left;
 	bool right;
 	bool up;
 	bool down;
-};
+}notesData_var;
 
 /* ------------------------------------------------------*/
 /* HEADER TAGS PARSING FUNCTION (Title, Artist, BPMs...) */
 /* ------------------------------------------------------*/
+
 void Parse(const std::string& line)
 {
 	if (line[0] == '//')
@@ -192,7 +218,7 @@ void Parse(const std::string& line)
 			const char* pOffset = offset.c_str();
 			char* pEnd;
 			metaData_var.offset = strtof(pOffset, &pEnd);
-			cout << "Offset : " << std::fixed << std::setprecision(3) << metaData_var.offset << ";" << endl;
+			cout << "Offset : " << fixed << setprecision(3) << metaData_var.offset << ";" << endl;
 		}
 
 		else if (key == "SAMPLESTART") // OK
@@ -202,17 +228,17 @@ void Parse(const std::string& line)
 			const char* pSampleStart = sampleStart.c_str();
 			char* pEnd;
 			metaData_var.sampleStart = strtof(pSampleStart, &pEnd);
-			cout << "Sample Start : " << std::fixed << std::setprecision(3) << metaData_var.sampleStart << ";" << endl;
+			cout << "Sample Start : " << fixed << setprecision(3) << metaData_var.sampleStart << ";" << endl;
 		}
 
 		else if (key == "SAMPLELENGTH") // OK
 		{
 			size_t idx = line.find_first_of(':') + 1;
-			std::string sampleLength = line.substr(idx, line.size() - idx - 1);
+			string sampleLength = line.substr(idx, line.size() - idx - 1);
 			const char* pSampleLength = sampleLength.c_str();
 			char* pEnd;
 			metaData_var.sampleLength = strtof(pSampleLength, &pEnd);
-			cout << "Sample Length : " << std::fixed << std::setprecision(3) << metaData_var.sampleLength << ";" << endl;
+			cout << "Sample Length : " << fixed << setprecision(3) << metaData_var.sampleLength << ";" << endl;
 		}
 
 		else if (key == "SELECTABLE") // OK
@@ -241,7 +267,7 @@ void Parse(const std::string& line)
 			{
 				metaData_var.beat_bpm = iter->first;
 				metaData_var.bpm = iter->second;
-				cout << "BPMS : " << std::fixed << std::setprecision(3) << metaData_var.beat_bpm << " = " << std::fixed << std::setprecision(3) << metaData_var.bpm << ";" << endl;
+				cout << "BPMS : " << fixed << setprecision(3) << metaData_var.beat_bpm << " = " << fixed << setprecision(3) << metaData_var.bpm << ";" << endl;
 			}
 		}
 
@@ -264,7 +290,7 @@ void Parse(const std::string& line)
 			{
 				metaData_var.beat_stop = iter->first;
 				metaData_var.sec = iter->second;
-				cout << "STOPS : " << std::fixed << std::setprecision(3) << iter->first << " = " << std::fixed << std::setprecision(3) << iter->second << ";" << endl;
+				cout << "STOPS : " << fixed << setprecision(3) << iter->first << " = " << fixed << setprecision(3) << iter->second << ";" << endl;
 			}
 		}
 
@@ -277,24 +303,47 @@ void Parse(const std::string& line)
 		string test2 = bgChanges.substr(pos+1);
 
 		cout << "BGCHANGES : " << test1 << "," << test2 << endl;
-
 		}*/
-
-		else if (key == "NOTES")
-		{
-
-		}
 	}
 }
 
-/* ---------------------------------------------------------*/
-/* CHART DATA PARSING FUNCTION (Difficulty, Notes data...) */
-/* ---------------------------------------------------------*/
+/* -------------------------------------------------------*/
+/* CHART DATA PARSING FUNCTION (Difficulty, Notes data...)*/
+/* -------------------------------------------------------*/
 
-void ParseNotes(const std::string& line)
+void ParseNotes(ifstream& file)
 {
+	string newLine;
+	//ifstream file("Samples/ATB - 9 PM (Till I Come).SM");
+	while (getline(file, newLine))
+	{
+		deleteSpaces(newLine);
 
-}
+		if (newLine[0] == '#')
+		{
+			string key = newLine.substr(1, newLine.find_first_of(':') - 1);
+
+			if (key == "NOTES")
+			{
+				if (key == "dance-single")
+				{
+					cout << newLine << "";
+				}
+			}
+		}
+	}
+};
+
+/*if (newLine[0] == '#')
+{
+	string key = newLine.substr(1, newLine.find_first_of(':') - 1);
+
+	if (key == "NOTES")
+	{
+		deleteSpaces(newLine);
+		cout << newLine << endl;
+	}
+}*/
 
 /* ----------------------------------------------------*/
 /* MAIN FUNCTION THAT READ THE SM FILE LINES PER LINES */
@@ -302,26 +351,27 @@ void ParseNotes(const std::string& line)
 
 int main()
 {
-	std::string line;
-	std::ifstream file("Samples/ATB - 9 PM (Till I Come).SM");
-	//ifstream file("Samples/blythe.SM");
-	//ifstream file("Samples/Galneryus - ALSATIA.SM");
-	//ifstream file ("Samples/Mr Oizo - Flat Beat.SM");
+	string line;
+	ifstream file("Samples/ATB - 9 PM (Till I Come).SM");
 	if (file.is_open())
 	{
-		while (std::getline(file, line))
+		while (getline(file, line))
 		{
-			//std::cout << line << "";
-			Parse(line);
-			//ParseNotes(line);
+			//Parse(line);
+			ParseNotes(file);
+
 		}
 		file.close();
 	}
 	else
 	{
-		std::cout << "File is not open" << '\n';
-		std::cin.get();
+		cout << "Cannot Open SM file" << '\n';
+		cin.get();
 	}
+
+	//Pause the program each builds
+	system("PAUSE");
+	return 0;
 
 	/*string myString = "100";
 	float myValue = convertToFloat(myString);
