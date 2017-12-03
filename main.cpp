@@ -311,25 +311,30 @@ void Parse(const std::string& line)
 /* CHART DATA PARSING FUNCTION (Difficulty, Notes data...)*/
 /* -------------------------------------------------------*/
 
-void ParseNotes(ifstream& file)
+void ParseNotes(string& newLine)
 {
-	string newLine;
-	//ifstream file("Samples/ATB - 9 PM (Till I Come).SM");
-	while (getline(file, newLine))
+	//On charge le fichier SM
+	ifstream newFile("Samples/ATB - 9 PM (Till I Come).SM");
+	//On lit le fichier lignes par lignes
+	while (getline(newFile, newLine))
 	{
-		deleteSpaces(newLine);
-
+		//Si la ligne commence par un '#'...
 		if (newLine[0] == '#')
 		{
+			//On substr ce qui ce trouve derriere ':' et on le stocke dans une variable "key"
 			string key = newLine.substr(1, newLine.find_first_of(':') - 1);
 
 			if (key == "NOTES")
 			{
-				if (key == "dance-single")
-				{
-					cout << newLine << "";
-				}
+				//cout << newLine << "";
 			}
+		}
+		else
+		{
+			deleteSpaces(newLine);
+			size_t idx = newLine.find_first_of(':') - 1;
+			string test = newLine.substr(idx, newLine.size() - idx - 1);
+			cout << test << endl;
 		}
 	}
 };
@@ -352,14 +357,13 @@ void ParseNotes(ifstream& file)
 int main()
 {
 	string line;
+	string newLine;
 	ifstream file("Samples/ATB - 9 PM (Till I Come).SM");
 	if (file.is_open())
 	{
 		while (getline(file, line))
 		{
-			//Parse(line);
-			ParseNotes(file);
-
+			Parse(line);
 		}
 		file.close();
 	}
@@ -369,6 +373,7 @@ int main()
 		cin.get();
 	}
 
+	ParseNotes(newLine);
 	//Pause the program each builds
 	system("PAUSE");
 	return 0;
