@@ -127,11 +127,11 @@ struct Notes
 /* HEADER TAGS PARSING FUNCTION (Title, Artist, BPMs...) */
 /* ------------------------------------------------------*/
 
-void Parse(const std::string& line)
+bool ParseHeader(const std::string& line)
 {
 	if (line[0] == '//')
 	{
-		return;
+		return true;
 	}
 	else if (line[0] == '#')
 	{
@@ -294,7 +294,15 @@ void Parse(const std::string& line)
 			}
 		}
 
-		/*else if (key == "BGCHANGES") // NOT IMPLEMENTED NOW
+		else if (key == "NOTES") // OK
+		{
+			return false;
+		}
+
+		return true;
+
+
+		/*else if (key == "BGCHANGES") // NOT IMPLEMENTED YET
 		{
 		size_t idx = line.find_first_of(':') + 1;
 		string bgChanges = line.substr(idx,line.size()- idx - 1);
@@ -311,43 +319,23 @@ void Parse(const std::string& line)
 /* CHART DATA PARSING FUNCTION (Difficulty, Notes data...)*/
 /* -------------------------------------------------------*/
 
-void ParseNotes(string& newLine)
+void ParseNotes(string& line)
 {
-	//On charge le fichier SM
-	ifstream newFile("Samples/ATB - 9 PM (Till I Come).SM");
-	//On lit le fichier lignes par lignes
-	while (getline(newFile, newLine))
+	if (line.length() != 0)
 	{
-		//Si la ligne commence par un '#'...
-		if (newLine[0] == '#')
-		{
-			//On substr ce qui ce trouve derriere ':' et on le stocke dans une variable "key"
-			string key = newLine.substr(1, newLine.find_first_of(':') - 1);
-
-			if (key == "NOTES")
-			{
-				//cout << newLine << "";
-			}
-		}
-		else
-		{
-			deleteSpaces(newLine);
-			size_t idx = newLine.find_first_of(':') - 1;
-			string test = newLine.substr(idx, newLine.size() - idx - 1);
-			cout << test << endl;
-		}
+		string key = line.substr(1, line.find_first_of(':') - 1);
 	}
-};
+}
 
 /*if (newLine[0] == '#')
 {
-	string key = newLine.substr(1, newLine.find_first_of(':') - 1);
+string key = newLine.substr(1, newLine.find_first_of(':') - 1);
 
-	if (key == "NOTES")
-	{
-		deleteSpaces(newLine);
-		cout << newLine << endl;
-	}
+if (key == "NOTES")
+{
+deleteSpaces(newLine);
+cout << newLine << endl;
+}
 }*/
 
 /* ----------------------------------------------------*/
@@ -358,24 +346,26 @@ int main()
 {
 	string line;
 	string newLine;
-	ifstream file("Samples/ATB - 9 PM (Till I Come).SM");
-	if (file.is_open())
-	{
+	bool isHeader = true;
+	ifstream file("Samples/ATB - 9 PM (Till I Come).sm");
+	if (file.is_open()) {
 		while (getline(file, line))
 		{
-			Parse(line);
+			if (isHeader) {
+				isHeader = ParseHeader(line);
+			}
+			else {
+				ParseNotes(line);
+			}
 		}
 		file.close();
 	}
-	else
-	{
+	else {
 		cout << "Cannot Open SM file" << '\n';
 		cin.get();
 	}
 
 	ParseNotes(newLine);
-	//Pause the program each builds
-	system("PAUSE");
 	return 0;
 
 	/*string myString = "100";
